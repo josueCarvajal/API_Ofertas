@@ -3,3 +3,4 @@ env_ofertas/**/*
 src/db/__pycache__
 src/endpoints/__pycache__
 src/conf/secret/**
+src/db/FirebaseAdmin.py

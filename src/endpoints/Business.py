@@ -60,3 +60,7 @@ def deletePostRef(business_id,post_id):
     businessCollection.document(business_id).update({
         "posts": firestore.ArrayRemove([post_id])
     })
+
+# Load the business info required by the post
+def getBusinessById(business_id):
+    return businessCollection.document(business_id).get().to_dict()
