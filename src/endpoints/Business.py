@@ -1,66 +1,66 @@
 from flask import Blueprint, jsonify, request
-from db.FirebaseAdmin import db,firestore
+import db.FirebaseAdmin as firebase
 from endpoints.User import addBusinessRef,deleteBusinessRef
-
 business_endpoint = Blueprint('business_endpoint', __name__)
 
 #Collection of the business
-businessCollection = db.collection('business')
+businessCollection = firebase.db.collection('business')
 
+##### ROUTES #####
 
 # Creates a new document entry in Business collection.
 # business_id as document name
 # @return String
 @business_endpoint.route("/create", methods=['POST'])
 def createBusiness():
-    business_id = businessCollection.document().id
-    businessCollection.document(business_id).set(request.json)
+    business_id = firebase.createCollection(businessCollection,request.json)
     user_id = request.json['user_id']
-    #update the business at the user collection
     addBusinessRef(user_id,business_id)
     return "Added successfully"
 
+# Get a document by id
+@business_endpoint.route("/get")
+def getBusiness():
+    business_id = request.json['business_id'] 
+    return firebase.getDocument(businessCollection,business_id)
+
+# Update a business by id
+@business_endpoint.route("/update/<string:business_id>", methods=["POST"])
+def updateBusiness(business_id):
+    firebase.updateDocument(businessCollection,business_id,request.json)
+    return "Business updated"
+
+# Get the business owned by an user
+@business_endpoint.route("/get/user")
+def getBusinessByUser():
+    user_id = request.json['user_id']
+    businessList = firebase.getAllDocumentsByFilter(businessCollection,'user_id','==',user_id)
+    return jsonify(businessList)
+
+# Detele a business by id
 @business_endpoint.route("/delete/", methods=['POST'])
 def deleteBusiness():
     business_id = request.json['business_id']
     user_id = request.json['user_id']
-    businessCollection.document(business_id).delete()
+    firebase.deleteDocument(businessCollection,business_id)
     deleteBusinessRef(user_id,business_id)
     return "Removed successfully"
 
 
-@business_endpoint.route("/get")
-def getBusiness():
-    business_id = request.json['business_id']
-    return businessCollection.document(business_id).get().to_dict()
-
-@business_endpoint.route("/get/user")
-def getBusinessByUser():
-    user_id = request.json['user_id']
-    businessByUser = businessCollection.where('user_id','==',user_id).stream()
-    businessList = []
-    for business in businessByUser:
-        businessList.append(business.to_dict())
-    return jsonify(businessList)
-
-@business_endpoint.route("/update/<string:business_id>", methods=["POST"])
-def updateBusiness(business_id):
-    businessCollection.document(business_id).set(request.json)
-    return "Business updated"
-
+##### METHODS #####
 
 # Add a new post to a business by postid
 def addPostRef(business_id,post_id):
     businessCollection.document(business_id).update({
-        "posts": firestore.ArrayUnion([post_id])
+        "posts": firebase.firestore.ArrayUnion([post_id])
     })
 
 # Delete a post from business by postid
 def deletePostRef(business_id,post_id):
     businessCollection.document(business_id).update({
-        "posts": firestore.ArrayRemove([post_id])
+        "posts": firebase.firestore.ArrayRemove([post_id])
     })
 
 # Load the business info required by the post
 def getBusinessById(business_id):
-    return businessCollection.document(business_id).get().to_dict()
+    return firebase.getDocument(businessCollection,business_id)
