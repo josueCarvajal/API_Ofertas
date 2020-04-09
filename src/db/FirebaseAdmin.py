@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials,firestore,exceptions
 
-cred = credentials.Certificate("ServiceAccountKey.json path here")
+cred = credentials.Certificate("ServiceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -12,6 +12,7 @@ db = firestore.client()
 def createCollection(collection, request):
     entry_id = collection.document().id
     collection.document(entry_id).set(request)
+    collection.document(entry_id).set({"id":entry_id},merge=True)
     return entry_id
 
 # Get a single document by id
