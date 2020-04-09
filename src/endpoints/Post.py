@@ -18,7 +18,7 @@ def createPost():
     post_id = firebase.createCollection(postCollection,request.json)
     business_id = request.json["business_id"]
     addPostRef(business_id,post_id)
-    return jsonify({"message": "Added successfully", "status": True})
+    return jsonify({"message": "Added successfully", "status": True, "id": post_id})
 
 # Update an existing post
 # @param String The post id

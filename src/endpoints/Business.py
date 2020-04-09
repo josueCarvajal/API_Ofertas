@@ -16,7 +16,7 @@ def createBusiness():
     business_id = firebase.createCollection(businessCollection,request.json)
     user_id = request.json['user_id']
     addBusinessRef(user_id,business_id)
-    return jsonify({"message": "Added successfully", "status": True})
+    return jsonify({"message": "Added successfully", "status": True,"id": business_id})
 
 # Get a document by id
 @business_endpoint.route("/get")
