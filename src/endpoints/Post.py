@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
 import db.FirebaseAdmin as firebase
+import calendar
+import time
 from endpoints.Business import addPostRef,deletePostRef,getBusinessById
 post_endpoint = Blueprint('post_endpoint', __name__)
 
@@ -57,7 +59,8 @@ def getPostsByBusiness():
 @post_endpoint.route("/get/chunk")
 def getFirstChunkOfPosts():
     retrievedDocs = []
-    docs = postCollection.order_by('created_at').limit(CHUNK_SIZE).stream()
+    systemDate = calendar.timegm(time.gmtime())
+    docs = postCollection.where('expiry_time','>=',str(systemDate)).order_by('expiry_time').limit(CHUNK_SIZE).stream()
     for doc in docs:
         retrievedDocs.append(doc.to_dict())
     return jsonify(retrievedDocs)
@@ -67,8 +70,9 @@ def getFirstChunkOfPosts():
 @post_endpoint.route("/get/next/chunk", methods = ['POST'])
 def getNextChunkOfPosts():
     retrievedDocs = []
-    lastPost = request.json["created_at"]
-    docs = postCollection.order_by('created_at').start_after({'created_at': lastPost}).limit(CHUNK_SIZE).stream()
+    lastPost = request.json["expiry_time"]
+    systemDate = calendar.timegm(time.gmtime())
+    docs = postCollection.where('expiry_time','>=',str(systemDate)).order_by('expiry_time').start_after({'expiry_time': lastPost}).limit(CHUNK_SIZE).stream()
     for doc in docs:
         retrievedDocs.append(doc.to_dict())
     return jsonify(retrievedDocs)
