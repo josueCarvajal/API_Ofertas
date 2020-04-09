@@ -10,7 +10,6 @@ postCollection = firebase.db.collection('post')
 #The number of posts retrieved by request
 CHUNK_SIZE = 10
 
-
 # Creates a new document entry in Business collection.
 # business_id as document name
 # @return String
@@ -19,14 +18,14 @@ def createPost():
     post_id = firebase.createCollection(postCollection,request.json)
     business_id = request.json["business_id"]
     addPostRef(business_id,post_id)
-    return "Added successfully"
+    return jsonify({"message": "Added successfully", "status": True})
 
 # Update an existing post
 # @param String The post id
 @post_endpoint.route("/update/<string:post_id>", methods=["POST"])
 def updatePost(post_id):
     firebase.updateDocument(postCollection,post_id,request.json)
-    return "Post updated"
+    return jsonify({"message": "Post updated successfully", "status": True})
 
 # Delete a post by id
 @post_endpoint.route("/delete", methods=['POST'])
@@ -35,7 +34,7 @@ def deletePost():
     post_id = request.json['post_id']
     firebase.deleteDocument(postCollection,post_id)
     deletePostRef(business_id,post_id)
-    return "Removed successfully"
+    return jsonify({"message": "Post Removed successfully", "status": True})
 
 #get a post by id
 @post_endpoint.route("/get")
@@ -76,5 +75,3 @@ def getNextChunkOfPosts():
     for doc in docs:
         retrievedDocs.append(doc.to_dict())
     return jsonify(retrievedDocs)
-
-

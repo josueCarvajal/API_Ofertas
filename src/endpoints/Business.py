@@ -16,7 +16,7 @@ def createBusiness():
     business_id = firebase.createCollection(businessCollection,request.json)
     user_id = request.json['user_id']
     addBusinessRef(user_id,business_id)
-    return "Added successfully"
+    return jsonify({"message": "Added successfully", "status": True})
 
 # Get a document by id
 @business_endpoint.route("/get")
@@ -28,7 +28,7 @@ def getBusiness():
 @business_endpoint.route("/update/<string:business_id>", methods=["POST"])
 def updateBusiness(business_id):
     firebase.updateDocument(businessCollection,business_id,request.json)
-    return "Business updated"
+    return jsonify({"message": "Business updated successfully", "status": True})
 
 # Get the business owned by an user
 @business_endpoint.route("/get/user")
@@ -44,7 +44,7 @@ def deleteBusiness():
     user_id = request.json['user_id']
     firebase.deleteDocument(businessCollection,business_id)
     deleteBusinessRef(user_id,business_id)
-    return "Removed successfully"
+    return jsonify({"message": "Business removed successfully", "status": True})
 
 
 ##### METHODS #####
