@@ -61,7 +61,9 @@ def getFirstChunkOfPosts():
     systemDate = calendar.timegm(time.gmtime())
     docs = postCollection.where('expiry_time','>=',str(systemDate)).order_by('expiry_time').limit(CHUNK_SIZE).stream()
     for doc in docs:
-        retrievedDocs.append(doc.to_dict())
+        retrievedDocument = doc.to_dict()
+        if retrievedDocument["enabled"] == True:
+            retrievedDocs.append(retrievedDocument)
     return jsonify(retrievedDocs)
 
 # Get the next chunk of posts.
@@ -73,5 +75,7 @@ def getNextChunkOfPosts():
     systemDate = calendar.timegm(time.gmtime())
     docs = postCollection.where('expiry_time','>=',str(systemDate)).order_by('expiry_time').start_after({'expiry_time': lastPost}).limit(CHUNK_SIZE).stream()
     for doc in docs:
-        retrievedDocs.append(doc.to_dict())
+        retrievedDocument = doc.to_dict()
+        if retrievedDocument["enabled"] == True:
+            retrievedDocs.append(retrievedDocument)  
     return jsonify(retrievedDocs)
