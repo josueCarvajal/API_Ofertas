@@ -1,2 +1,2 @@
 # Python FLASK API
-Just a test of a simple FLASK app in python integrated with firebase to test posible scopes
+Simple FLASK app in python integrated with firebase exposing 3 endpoints in order to get familiarized with FLASK functionality
